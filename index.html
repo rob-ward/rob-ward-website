@@ -32,6 +32,55 @@ body {
 <object><hr/></object>
 </p>
 
+
+<h2>2014-10-28</h2>
+<p>
+<code>
+So, the first stage for me to build a custom Linux distro is to sort out repos for
+the build system and packages I want to build.
+<br/><br/>
+I previously decided I was going to use github to host this work, at least
+initially. As such my plan is to create a single repo to store my build system.
+I will also have a separate repo for storing each of the packages I am going to
+build, at least I will for any that are not already available in a git repo or
+where I need the ability to modify them.
+<br/><br/>I generally use the git-repo[0]
+tool developed by Google for the android project when I want to manage multiple
+git repos. Git-repo works very well and gives you a lot of control, especially
+when sharing code between multiple teams.
+<br/><br/>
+I have however decided that I am going to use git submodules[1] instead, I have
+used these in the past and they should do what I need at the moment, I can always
+change later easily enough if I need to.
+<br/><br/>
+So to start with I will be creating a repo that will manage the submodules and
+also hold the top level build system and documentation. Below this I will place
+all the source that I am building as separate repos.
+<br/><br/>
+In order to create a repo I need a name and custom-linux-distro just doesn't
+quite work for me. As such I have decided, at least for now, to call it
+intrepid-Linux.
+<br/><br/>
+So that is it, I have created the repo[2] and all I have to do is start adding code
+and building up a system.
+<br/><br/>
+Easy right....
+<br/><br/>
+Well actually the first few stages are quite easy, my first task will be to add
+some build commands for the kernel and get it building and running in QEMU. I
+will do the first stage with a initramfs only(I will cover what this is later)
+and I will add a microscopic statically linked init system into the mix as well
+to prevent the kernel rebooting straight away. At this point I will need to
+decide on a plan for what I want to achieve first and how...
+<br/>
+<br/>
+[0] - https://code.google.com/p/git-repo/<br/>
+[1] - http://git-scm.com/book/en/v2/Git-Tools-Submodules<br/>
+[2] - https://github.com/rob-ward/intrepid-linux<br/>
+<br/>
+</code>
+<object><hr/></object>
+</p>
 	<h2>2014-10-27</h2>
 <p>
 <code>
