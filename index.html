@@ -13,12 +13,50 @@
 body {
     font-family: monospace;
 } 
+
+a:link {
+    color: #000;
+}
+
+a:visited {
+    color: #000;
+}
+
+#menu {
+    float: left;
+    margin-right: 20px;
+}
+
+#content {
+    overflow: hidden;
+    text-align: left;
+}
+
+#top {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#checker {
+    float: right;
+}
+
+h3 {
+    margin-top: -5px;
+}
+
+h1 {
+    display: inline;
+}
+
 </style>
 </head>
 
 <body>
-	<h1>Rob Ward's Blog</h1>
-<p>
+<div id="top">
+
+<h1>Rob Ward's Website</h1>
+<div id="checker">
     <a href="http://validator.w3.org/check?uri=referer"><img
       src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a>
 
@@ -27,268 +65,26 @@ body {
             src="http://jigsaw.w3.org/css-validator/images/vcss"
             alt="Valid CSS!" />
     </a>
-</p>
-<p>
-<object><hr/></object>
-</p>
-
-
-<h2>2014-10-30</h2>
-<p>
-<code>
-Making progress slowly, not getting much time at the moment, I do however commute a long way so have managed to spend a bit of time on my less busy trains getting a few bits implemented.
-<br/><br/>
-So far I have added the Linux stable repo into my project as a submodule. I am using the upstream version from kernel.org as I don't currently need to modify any of the kernels source. If that changes I will switch to using my own version hosted on GitHub.
-<br/><br/>
-As well as adding the Linux kernel source I have also added a first version of a makefile. Currently it is slightly messy and only defines a few variables and a couple of targets. The main target is for building the Linux kernel.
-<br/><br/>
-Currently the way I build the kernel is hacky but it works as a first stage. The makefile itself is in the git repo already but the following in the set of commands that are in the make target:
-<br/>
-</code>
-</p>
-<div style="margin-left:5em; color:#555">
-<p>
-        $(QUIET)cd $(LINUX_SRC_DIR) &amp;&amp; $(MAKE) x86_64_defconfig<br/>
-        $(QUIET)cd $(LINUX_SRC_DIR) &amp;&amp; $(MAKE) --jobs=4 modules<br/>
-        $(QUIET)cd $(LINUX_SRC_DIR) &amp;&amp; $(MAKE) --jobs=4 modules_install INSTALL_MOD_PATH=$(INITRAMFS_DIR)<br/>
-        # Now setup the initramfs<br/>
-        $(QUIET)sed -i s^CONFIG_INITRAMFS_SOURCE=\"\"^CONFIG_INITRAMFS_SOURCE=\"\"\\nCONFIG_INITRAMFS_ROOT_UID=\\nCONFIG_INITRAMFS_ROOT_GID=\\n^g $(LINUX_SRC_DIR)/.config<br/>
-        $(QUIET)sed -i s^CONFIG_INITRAMFS_SOURCE=\"\"^CONFIG_INITRAMFS_SOURCE=\"$(LINUX_INITRAMFS_CONFIG)\ $(INITRAMFS_DIR)\"^g $(LINUX_SRC_DIR)/.config<br/>
-        $(QUIET)sed -i s^CONFIG_INITRAMFS_ROOT_UID=^CONFIG_INITRAMFS_ROOT_UID=`id -u`^g $(LINUX_SRC_DIR)/.config<br/>
-        $(QUIET)sed -i s^CONFIG_INITRAMFS_ROOT_GID=^CONFIG_INITRAMFS_ROOT_GID=`id -u`^g $(LINUX_SRC_DIR)/.config<br/>
-        $(QUIET)cd $(LINUX_SRC_DIR) &amp;&amp; $(MAKE) --jobs=4<br/>
-</p>
 </div>
-<p>
-<code>
-<br/>
-I have chosen to use the default x86_64_defconfig, this keeps the current implementation very simple. I will however need to implement the use of custom kernel configs and the ability to build different architecture in the not too distant future.
-<br/><br/>
-What the current build target does do however is build the kernel modules and install them in a location that can then be included in the initramfs. I have also put some sed commands in place that setup the source location for the initramfs and the UID and GID. The sed commands are rather evil but they work for now.
-<br/><br/>
-The CONFIG_INITRAMFS_SOURCE is used to give a list of locations of files to include in the initramfs. This can either be a config file or a directory. If it is a directory then the contents are included in the initramfs. In my current implementation I pass both a config file and a directory. The directory that I pass is the INITRAMFS_DIR, this is where the kernel modules are installed after building and where I will install any of the other utilities that I need in the initramfs going forward. The config file is a plain text file that is used to specify directories or device nodes that should be created. The current config file I am using is very simple and creates the directories /dev, /proc, /sys and the device node /dev/console. My current config is in the git repo but looks like this:
-<br/><br/>
-</code>
-</p>
-<div style="margin-left:5em; color:#555">
-<p>
-	dir /dev 755 0 0<br/>
-	nod /dev/console 644 0 0 c 5 1<br/>
-	dir /proc 755 0 0<br/>
-	dir /sys 755 0 0
-</p>
 </div>
-<p>
-<code>
-<br/>
-The CONFIG_INITRAMFS_ROOT_{UID/GID} are used to tell the kernels build system to map the files user/group permissions from the given UID/GID to be owned by the root user.
-<br/><br/>
-You will notice looking at the build commands above that I am calling make with --jobs=4 in order to build multi-threaded. I chose 4 simply because I was on my laptop with 4 CPU's. A future enhancement will make the number of jobs dynamic depending on the number of cores the machine building has, well unless I add distcc into the mix.
-<br/><br/>
-So where does that leave me at the minute? Well if I run the make command a kernel is successfully built. The end result of the build is:
-<br/><br/>
-</code>
-</p>
-<div style="margin-left:5em; color:#555">
-<p>
-	Kernel: arch/x86/boot/bzImage is ready  (#7)
-</p>
+<div id="menu">
+<a href="index.html"><h3>About Me</h3></a>
+<h3>Development</h3>
+--- <a href="projects.html">Projects</a><br/>
+--- <a href="ideas.html">Ideas</a><br/><br/>
+<a href="log.html"><h3>Log</h3></a>
+<a href="cv.html"><h3>CV</h3></a>
+<h3>Other Stuff</h3>
+--- <a href="linb.html">Linux in Browser</a><br/>
+--- <a href="links.html">Links</a><br/>
 </div>
-<p>
-<code>
-<br/>
-This bzImage file is the kernel + initramfs image that we can run.
-<br/><br/>
-To run the image I am currently using qemu, the command I am using to run it is:
-<br/><br/>
-</code>
-</p>
-<div style="margin-left:5em; color:#555">
-<p>
-	qemu-system-x86_64 -kernel src/Linux-stable/arch/x86/boot/bzImage -append "console=ttyS0" -serial stdio
-</p>
+<div id="content">
+My name is Rob Ward and this website is where I am attempting to document what projects I work on and things that interest me in general.<br/><br/>
+I am a Software Engineer specialising in Linux Development with focus on embedded systems, Linux Kernel development, "distro" development, Security and Networking. I have also worked on application development within embedded systems and web development. I also have a habit of finding random pieces of code or areas of development and learning them just to see how they work.<br/><br/>
+I currently reside in Yorkshire in the UK.<br/><br/>
+I have several hobbies ranging from flying model helicopters(crashing them with style may be more accurate) to gaming and going to the cinema. I also have an extensive collection of DVDs, most are TV series which I generally prefer over movies, most are SciFi/Fantasy series and I have way too much information about random TV universes in my brain to be considered healthy.<br/><br/>
+Most of the content of this site is contained within the log where I'm trying to document what I work on and when....<br/>
 </div>
-<p>
-<code>
-<br/>
-When run the kernel boots up until the point where it panics and explodes horribly:
-<br/><br/>
-</code>
-</p>
-<div style="margin-left:5em; color:#555">
-<p>
-
-
-	[    2.589339] Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)<br/>
-	[    2.590230] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 3.17.1 #7<br/>
-	[    2.590230] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011<br/>
-	[    2.590230]  0000000000008001 ffff8800070a3dd8 ffffffff81805696 ffffffff81baa678<br/>
-	[    2.590230]  ffff8800070a3e50 ffffffff81801e78 0000000000000010 ffff8800070a3e60<br/>
-	[    2.590230]  ffff8800070a3e00 0000000800000000 ffff8800070a3e70 0000000000000014<br/>
-	[    2.590230] Call Trace:<br/>
-	[    2.590230]  [&lt;ffffffff81805696&gt;] dump_stack+0x45/0x56<br/>
-	[    2.590230]  [&lt;ffffffff81801e78&gt;] panic+0xbd/0x1e1<br/>
-	[    2.590230]  [&lt;ffffffff81ef143b&gt;] mount_block_root+0x183/0x221<br/>
-	[    2.590230]  [&lt;ffffffff81ef15d3&gt;] mount_root+0xfa/0x103<br/>
-	[    2.590230]  [&lt;ffffffff81ef1718&gt;] prepare_namespace+0x13c/0x174<br/>
-	[    2.590230]  [&lt;ffffffff81ef1171&gt;] kernel_init_freeable+0x1c5/0x1d3<br/>
-	[    2.590230]  [&lt;ffffffff81ef08f2&gt;] ? do_early_param+0x8a/0x8a<br/>
-	[    2.590230]  [&lt;ffffffff817feb40&gt;] ? rest_init+0x80/0x80<br/>
-	[    2.590230]  [&lt;ffffffff817feb49&gt;] kernel_init+0x9/0xf0<br/>
-	[    2.590230]  [&lt;ffffffff8180f22c&gt;] ret_from_fork+0x7c/0xb0<br/>
-	[    2.590230]  [&lt;ffffffff817feb40&gt;] ? rest_init+0x80/0x80<br/>
-	[    2.590230] Kernel Offset: 0x0 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffff9fffffff)<br/>
-	[    2.590230] ---[ end Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)<br/>
-	[    2.590230] general protection fault: fff2 [#1] SMP <br/>
-	[    2.590230] Modules linked in:<br/>
-	[    2.590230] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 3.17.1 #7<br/>
-	[    2.590230] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011<br/>
-	[    2.590230] task: ffff880007098000 ti: ffff8800070a0000 task.ti: ffff8800070a0000<br/>
-	[    2.590230] RIP: 0010:[&lt;ffffffff81801f63&gt;]  [&lt;ffffffff81801f63&gt;] panic+0x1a8/0x1e1<br/>
-	[    2.590230] RSP: 0000:ffff8800070a3de8  EFLAGS: 00000246<br/>
-	[    2.590230] RAX: 0000000000000057 RBX: ffffffff81baa678 RCX: 00000000000000d4<br/>
-	[    2.590230] RDX: 0000000000000063 RSI: 0000000000000046 RDI: ffffffff82072cc4<br/>
-	[    2.590230] RBP: ffff8800070a3e50 R08: 6b6e75206e6f2073 R09: 0000000000000000<br/>
-	[    2.590230] R10: 6c622d6e776f6e6b R11: 29302c30286b636f R12: 0000000000000000<br/>
-	[    2.590230] R13: 0000000000000000 R14: 0000000000000000 R15: ffff88000727a000<br/>
-	[    2.590230] FS:  0000000000000000(0000) GS:ffff880007c00000(0000) knlGS:0000000000000000<br/>
-	[    2.590230] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b<br/>
-	[    2.590230] CR2: 0000000000000000 CR3: 0000000001e14000 CR4: 00000000000006f0<br/>
-	[    2.590230] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000<br/>
-	[    2.590230] DR3: 0000000000000000 DR6: 0000000000000000 DR7: 0000000000000000<br/>
-	[    2.590230] Stack:<br/>
-	[    2.590230]  0000000000000010 ffff8800070a3e60 ffff8800070a3e00 0000000800000000<br/>
-	[    2.590230]  ffff8800070a3e70 0000000000000014 0000000000000000 0000000800000000<br/>
-	[    2.590230]  00000008ffffffff ffff88000727a000 0000000000008001 0000000000008001<br/>
-	[    2.590230] Call Trace:<br/>
-	[    2.590230]  [&lt;ffffffff81ef143b&gt;] mount_block_root+0x183/0x221<br/>
-	[    2.590230]  [&lt;ffffffff81ef15d3&gt;] mount_root+0xfa/0x103<br/>
-	[    2.590230]  [&lt;ffffffff81ef1718&gt;] prepare_namespace+0x13c/0x174<br/>
-	[    2.590230]  [&lt;ffffffff81ef1171&gt;] kernel_init_freeable+0x1c5/0x1d3<br/>
-	[    2.590230]  [&lt;ffffffff81ef08f2&gt;] ? do_early_param+0x8a/0x8a<br/>
-	[    2.590230]  [&lt;ffffffff817feb40&gt;] ? rest_init+0x80/0x80<br/>
-	[    2.590230]  [&lt;ffffffff817feb49&gt;] kernel_init+0x9/0xf0<br/>
-	[    2.590230]  [&lt;ffffffff8180f22c&gt;] ret_from_fork+0x7c/0xb0<br/>
-	[    2.590230]  [&lt;ffffffff817feb40&gt;] ? rest_init+0x80/0x80<br/>
-	[    2.590230] Code: 39 d8 7f b8 83 3d fd f1 82 00 00 74 05 e8 16 5c 86 ff 48 c7 c6 60 11 03 82 48 c7 c7 d8 7e bb 81 31 c0 e8 77 05 00 00 fb 45 31 e4 &lt;4d&gt; 39 ec 7c 18 41 83 f6 01 44 89 f7 ff 15 ab f1 82 00 49 01 c4 <br/>
-	[    2.590230] RIP  [&lt;ffffffff81801f63&gt;] panic+0x1a8/0x1e1<br/>
-	[    2.590230]  RSP &lt;ffff8800070a3de8&gt;<br/>
-	[    2.590230] ---[ end trace 9dbf8f6652588d07 ]---<br/>
-
-
-</p>
-</div>
-<p>
-<code>
-<br/>
-Generally when you boot a Linux kernel it will try and run the application /init which is used to setup and configure userspace and run every other application on your system. The build I ran above didn't have an init so once the kernel finishes booting it has nothing to call and dies horribly.
-<br/><br/>
-As such my next step was to create a minimal init application to include in the initramfs. The simplest way of creating a init application is a statically linked C application. I have created this and placed in another git repo called microinit[0] that I have added to GitHub. I have then added this as a submodule and added the microinit target in the makefile.
-<br/><br/>
-At this point I now have a kernel+initramfs that boots and runs, admittedly all it does at the moment is sit and say "Microinit is running" once a second, but small steps.
-<br/><br/>
-My next stage will be to get an actual command line up and running. I have usually used Busybox[1], however for what I am doing as space/speed isn't really the point I could use the full utilities as ship with most distros. The other choice is the use a newer package called Toybox[2], I have never used this before so I may have to give it ago, I know it isn't finished but it may do what I need at the moment.
-<br/><br/>
-I also have to start thinking about toolchains and how to manage them. Currently I think I will probably build a Toolchain(or a few) and store them as binaries rather than building a toolchain every time.
-<br/><br/>
-One other think I am considering doing is making all of this build in a fakechroot environment, I have used this a few times for compiling software and it does make cross compiling easier for certain uncooperative packages, I haven't built a full system using it though. Again this would be something new to try so I think I will have ago and see what happens. It does mean that I will need to build a number of the host tools, or take copies of them into the fakechroot along with the compiler that I am using to cross compile with. This adds complexity but would make the system more self contained.
-<br/><br/>
-[0] - https://github.com/rob-ward/microinit<br/>
-[1] - http://www.busybox.net/<br/>
-[2] - http://landley.net/toybox/<br/><br/>
-</code>
-<object><hr/></object>
-</p>
-
-<h2>2014-10-28</h2>
-<p>
-<code>
-So, the first stage for me to build a custom Linux distro is to sort out repos for
-the build system and packages I want to build.
-<br/><br/>
-I previously decided I was going to use github to host this work, at least
-initially. As such my plan is to create a single repo to store my build system.
-I will also have a separate repo for storing each of the packages I am going to
-build, at least I will for any that are not already available in a git repo or
-where I need the ability to modify them.
-<br/><br/>I generally use the git-repo[0]
-tool developed by Google for the android project when I want to manage multiple
-git repos. Git-repo works very well and gives you a lot of control, especially
-when sharing code between multiple teams.
-<br/><br/>
-I have however decided that I am going to use git submodules[1] instead, I have
-used these in the past and they should do what I need at the moment, I can always
-change later easily enough if I need to.
-<br/><br/>
-So to start with I will be creating a repo that will manage the submodules and
-also hold the top level build system and documentation. Below this I will place
-all the source that I am building as separate repos.
-<br/><br/>
-In order to create a repo I need a name and custom-linux-distro just doesn't
-quite work for me. As such I have decided, at least for now, to call it
-intrepid-Linux.
-<br/><br/>
-So that is it, I have created the repo[2] and all I have to do is start adding code
-and building up a system.
-<br/><br/>
-Easy right....
-<br/><br/>
-Well actually the first few stages are quite easy, my first task will be to add
-some build commands for the kernel and get it building and running in QEMU. I
-will do the first stage with a initramfs only(I will cover what this is later)
-and I will add a microscopic statically linked init system into the mix as well
-to prevent the kernel rebooting straight away. At this point I will need to
-decide on a plan for what I want to achieve first and how...
-<br/>
-<br/>
-[0] - https://code.google.com/p/git-repo/<br/>
-[1] - http://git-scm.com/book/en/v2/Git-Tools-Submodules<br/>
-[2] - https://github.com/rob-ward/intrepid-linux<br/>
-<br/>
-</code>
-<object><hr/></object>
-</p>
-	<h2>2014-10-27</h2>
-<p>
-<code>
-Okay folks, after several weeks(months(years???)) of thinking about it I have decided to create my own custom Linux[0] distro.
-<br/><br/>
-At this point I should probably clarify that this is not the first time that I have made my own custom distro. I work developing embedded Linux devices and as part of this I have developed custom Linux distros or built upon others custom distributions on several occasions. I have also personally built a number of simplified Linux distros in the past, usually for fun and to learn new technologies.
-<br/><br/>
-So what is different this time??? Well in the past the distros I have developed have all stopped at embedded device level, usable yes, but of limited functionality usually restricted to command line interfaces or running services i.e. web servers. In short, they have all had limited scope. This time I have decided that I want to create something on a larger scale, with nearly unlimited scope. I am not intending what I create to be of use for one specific purpose but rather as a personal playground where I can test and learn new technologies. In no way do I intend to create a Linux distro that you would download and install on your Grandparents PC. Hell, I don't really expect it to be something that anyone that isn't wanting to learn about or hack a Linux system will be even touching!
-<br/><br/>
-So what is the Plan? Well I suppose my plan is to come up with a plan. I do however have certain points already mapped out. 
-<br/><br/>
-Firstly I am (best intentions) going to try and keep this blog up to date with the progress that I am making, along with anything useful I learn on the way. I am also planning to do as much in the open as possible.
-<br/><br/>
-The development will happen using git as my version control system, generally I use Gerrit[1] as my git backend, however at least for now I am indenting to use GitHub[2] to store and share my work in progress. The key plan is to make everything available.
-<br/><br/>
-The majority of the work, at least to start with is creating a make system that is able to create a bootable Linux+RootFS. To start with this will all be done using GNU Make[3], however I have several ideas that I would like to explore with regards to make systems so I will likely swap and change this at some point.
-<br/><br/>
-I will initially be using QEMU[4] for development but that can(and will) change. I am also aiming to make the system in such a way that it is able to cross compile. Cross compilation generally adds a lot of complexity, however it highlights issues with packages that you are building very early. It also means you end up fixing broken upstream make systems quite often. I must admit at this point that I am slightly fearful of attempting to get Xorg cross compiling, it was painful enough a few years ago when I compiled it natively... but it is just another challenge to overcome. 
-<br/><br/>
-The system that I am building will need the ability to build itself so that will be one of the goals. I am also going to be using musl[5] as my c library, the primary reason for this is it looks like a nice project and I haven't used it for anything big as of yet. I will however aim to make the build system so it can support others(uClibc[6] and glibc[7] are the obvious ones but who knows).
-<br/><br/>
-The other thing I want to get right, and this relates back to potential alternatives to GNU make, is building in parallel as much as possible. When building something like this you should be able to use as many CPU cores as possible, I may even set it up for distcc[8] just for fun.
-<br/><br/>
-If I progress far enough I will have to start looking at storing parts of the builds as binaries, however that will be a long way down the road.
-<br/><br/>
-So that is it, the part of a plan that I have. As I figure more out I will update here, along with adding links to any repos with source in that I need.
-<br/><br/>
-
-[0] - https://www.kernel.org/<br/>
-[1] - https://code.google.com/p/gerrit/ <br/>
-[2] - https://github.com/<br/>
-[3] - http://www.gnu.org/software/make/<br/>
-[4] - http://www.qemu.org<br/>
-[5] - http://www.musl-libc.org/<br/>
-[6] - http://www.uclibc.org/<br/>
-[7] - http://www.gnu.org/software/libc/<br/>
-[8] - https://code.google.com/p/distcc/<br/>
-<br/>
-</code>
-<object><hr/></object>
-</p>
 </body>
-
 </html>
+
